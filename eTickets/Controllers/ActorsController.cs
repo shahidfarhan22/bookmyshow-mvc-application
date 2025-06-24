@@ -27,17 +27,6 @@ namespace eTickets.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([Bind("ProfilePictureURL, FullName, Bio")]Actor actor)
         {
-            Console.WriteLine("IsValid: " + ModelState.IsValid);
-            foreach (var state in ModelState)
-            {
-                Console.WriteLine($"Key: {state.Key}");
-                foreach (var error in state.Value.Errors)
-                {
-                    Console.WriteLine($"  Error: {error.ErrorMessage}");
-                }
-            }
-
-
             if (!ModelState.IsValid)
             {
                 return View(actor);
@@ -57,5 +46,27 @@ namespace eTickets.Controllers
             return View(actorDetails);
         }
 
-    }
+		//Get: Actors/Create
+		public async Task<IActionResult> Edit(int id)
+		{
+			var actorDetails = await _service.GetByIdAsync(id);
+			if (actorDetails == null) return View("Empty");
+
+
+			return View(actorDetails);
+		}
+
+		[HttpPost]
+		public async Task<IActionResult> Edit(int id, [Bind("Id, ProfilePictureURL, FullName, Bio")] Actor actor)
+		{
+			if (!ModelState.IsValid)
+			{
+				return View(actor);
+
+			}
+			await _service.UpdateAsync(id, actor);
+			return RedirectToAction(nameof(Index));
+		}
+
+	}
 }
